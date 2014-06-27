@@ -110,6 +110,20 @@ public class ArgsTest {
     assertEquals(false, args.getBoolean('y'));
   }
 
+
+  @Test
+  public void testInvalidArgumentValueFormat() throws Exception {
+    exception.expect(ArgsException.class);
+
+    try {
+      new Args("x, y", new String[]{"xy", "true", "false"});
+    } catch (ArgsException e) {
+      assertEquals(ArgsException.ErrorCode.INVALID_ARGUMENT_FORMAT, e.getErrorCode());
+      assertEquals('-', e.getErrorArgumentId());
+      throw e;
+    }
+  }
+
   @Test
   public void testSimpleStringPresent() throws Exception {
     Args args = new Args("x*", new String[]{"-x", "param"});

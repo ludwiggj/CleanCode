@@ -48,19 +48,16 @@ public class Args {
       throw new ArgsException(INVALID_ARGUMENT_NAME, elementId, null);
   }
 
-  private void parseArgumentStrings(List<String> argsList) throws ArgsException
-  {
-    for (currentArgument = argsList.listIterator(); currentArgument.hasNext();)
-    {
-      String argString = currentArgument.next();
-      if (argString.startsWith("-")) {
-        parseArgumentCharacters(argString.substring(1));
-      } else {
-        currentArgument.previous();
-        break;
-      }
+  private void parseArgumentStrings(List<String> argsList) throws ArgsException {
+    currentArgument = argsList.listIterator();
+    String argString = currentArgument.next();
+    if (argString.startsWith("-")) {
+      parseArgumentCharacters(argString.substring(1));
+    } else {
+      throw new ArgsException(INVALID_ARGUMENT_FORMAT, '-', "");
     }
   }
+
   private void parseArgumentCharacters(String argChars) throws ArgsException {
     for (int i = 0; i < argChars.length(); i++)
       parseArgumentCharacter(argChars.charAt(i));

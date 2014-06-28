@@ -49,12 +49,14 @@ public class Args {
   }
 
   private void parseArgumentStrings(List<String> argsList) throws ArgsException {
-    currentArgument = argsList.listIterator();
-    String argString = currentArgument.next();
-    if (argString.startsWith("-")) {
-      parseArgumentCharacters(argString.substring(1));
-    } else {
-      throw new ArgsException(INVALID_ARGUMENT_FORMAT, '-', "");
+    if (argsList.size() > 0) {
+      currentArgument = argsList.listIterator();
+      String argString = currentArgument.next();
+      if (argString.startsWith("-")) {
+        parseArgumentCharacters(argString.substring(1));
+      } else {
+        throw new ArgsException(INVALID_ARGUMENT_FORMAT, '-', "");
+      }
     }
   }
 

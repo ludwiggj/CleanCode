@@ -11,6 +11,8 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(JUnit4.class)
 public class ArgsTest {
+
+  @Test
   public void testCreateWithNoSchemaOrArguments() throws Exception {
     Args args = new Args("", new String[0]);
     assertEquals(0, args.cardinality());
@@ -21,48 +23,65 @@ public class ArgsTest {
 
   @Test
   public void testWithNoSchemaButWithOneArgument() throws Exception {
+    exception.expect(ArgsException.class);
+
     try {
       new Args("", new String[]{"-x"});
-      fail();
     } catch (ArgsException e) {
       assertEquals(ArgsException.ErrorCode.UNEXPECTED_ARGUMENT,
           e.getErrorCode());
       assertEquals('x', e.getErrorArgumentId());
+      throw e;
     }
   }
 
   @Test
+   public void testWithSchemaButWithNoArguments() throws Exception {
+     exception.expect(ArgsException.class);
+
+     try {
+       new Args("x", new String[0]);
+     } catch (ArgsException e) {
+       throw e;
+     }
+   }
+
+  @Test
   public void testWithNoSchemaButWithMultipleArguments() throws Exception {
     try {
+      exception.expect(ArgsException.class);
+
       new Args("", new String[]{"-x", "-y"});
-      fail();
     } catch (ArgsException e) {
       assertEquals(ArgsException.ErrorCode.UNEXPECTED_ARGUMENT,
           e.getErrorCode());
       assertEquals('x', e.getErrorArgumentId());
+      throw e;
     }
   }
 
   @Test
   public void testNonLetterSchema() throws Exception {
+    exception.expect(ArgsException.class);
     try {
       new Args("*", new String[]{});
-      fail("Args constructor should have thrown exception");
     } catch (ArgsException e) {
       assertEquals(ArgsException.ErrorCode.INVALID_ARGUMENT_NAME,
           e.getErrorCode());
       assertEquals('*', e.getErrorArgumentId());
+      throw e;
     }
   }
 
   @Test
   public void testInvalidArgumentFormat() throws Exception {
+    exception.expect(ArgsException.class);
     try {
       new Args("f~", new String[]{});
-      fail("Args constructor should have throws exception");
     } catch (ArgsException e) {
       assertEquals(ArgsException.ErrorCode.INVALID_ARGUMENT_FORMAT, e.getErrorCode());
       assertEquals('f', e.getErrorArgumentId());
+      throw e;
     }
   }
 

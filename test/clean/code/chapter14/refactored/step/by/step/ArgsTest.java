@@ -134,6 +134,13 @@ public class ArgsTest {
     assertEquals(false, args.isValid());
     assertEquals("Could not find string parameter for -x.",
         args.errorMessage());
+    assertEquals("", args.getString('x'));
+  }
+
+  @Test
+  public void testGetStringReturnsEmptyStringIfVariableNotPresent() throws Exception {
+    Args args = new Args("x*", new String[]{"-x", "true"});
+    assertEquals("", args.getString('y'));
   }
 
   @Test

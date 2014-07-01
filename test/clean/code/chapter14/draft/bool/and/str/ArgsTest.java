@@ -1,6 +1,5 @@
-package clean.code.chapter14.draft.first;
+package clean.code.chapter14.draft.bool.and.str;
 
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -9,8 +8,8 @@ import org.junit.runners.JUnit4;
 
 import java.text.ParseException;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(JUnit4.class)
 public class ArgsTest {
@@ -38,6 +37,7 @@ public class ArgsTest {
     assertEquals("Argument(s) -xy unexpected.", args.errorMessage());
   }
 
+  // FIXED!
   @Test
   public void testNonLetterSchema() throws Exception {
     exception.expect(ParseException.class);
@@ -46,6 +46,7 @@ public class ArgsTest {
     new Args("*", new String[]{});
   }
 
+  // Currently fails...
   @Test
   public void testInvalidArgumentFormat() throws Exception {
     exception.expect(ParseException.class);
@@ -61,7 +62,7 @@ public class ArgsTest {
     assertEquals(true, args.getBoolean('x'));
   }
 
-  @Ignore
+  // Currently fails...
   @Test
   public void testSimpleBooleanFalsePresent() throws Exception {
     Args args = new Args("x", new String[]{"-x", "false"});
@@ -69,14 +70,14 @@ public class ArgsTest {
     assertEquals(false, args.getBoolean('x'));
   }
 
-  @Ignore
+  // Currently fails...
   @Test
   public void testMissingBooleanArgument() throws Exception {
     Args args = new Args("x", new String[]{"-x"});
     assertEquals(false, args.isValid());
   }
 
-  @Ignore
+  // Currently fails...
   @Test
   public void testInvalidBoolean() throws Exception {
     Args args = new Args("x", new String[]{"-x", "Truthy"});
@@ -84,6 +85,15 @@ public class ArgsTest {
     assertEquals(false, args.getBoolean('x'));
   }
 
+  @Test
+  public void testMultipleBooleans() throws Exception {
+    Args args = new Args("x,y", new String[]{"-xy", "true", "true"});
+    assertEquals(2, args.cardinality());
+    assertEquals(true, args.getBoolean('x'));
+    assertEquals(true, args.getBoolean('y'));
+  }
+
+  // FIXED!
   @Test
   public void testSpacesInFormat() throws Exception {
     Args args = new Args("x, y", new String[]{"-xy", "true", "true"});
@@ -94,10 +104,10 @@ public class ArgsTest {
     assertEquals(true, args.getBoolean('y'));
   }
 
-  @Ignore
+  // Currently fails...
   @Test
   public void testInvalidArgumentValueFormat() throws Exception {
-    Args args = new Args("x, y", new String[]{"xy", "true", "false"});
+    Args args = new Args("x,y", new String[]{"xy", "true", "false"});
     assertEquals(false, args.isValid());
   }
 
@@ -114,30 +124,6 @@ public class ArgsTest {
     Args args = new Args("x*", new String[]{"-x"});
     assertEquals(false, args.isValid());
     assertEquals("Could not find string parameter for -x.",
-                args.errorMessage());
-  }
-
-  @Test
-  public void testSimpleIntPresent() throws Exception {
-    Args args = new Args("x#", new String[]{"-x", "42"});
-    assertEquals(1, args.cardinality());
-    assertTrue(args.has('x'));
-    assertEquals(42, args.getInt('x'));
-  }
-
-  @Test
-  public void testInvalidInteger() throws Exception {
-    Args args = new Args("x#", new String[]{"-x", "Forty two"});
-    assertEquals(false, args.isValid());
-    assertEquals("Argument -x expects an integer but was 'Forty two'.",
-                args.errorMessage());
-  }
-
-  @Test
-  public void testMissingInteger() throws Exception {
-    Args args = new Args("x#", new String[]{"-x"});
-    assertEquals(false, args.isValid());
-    assertEquals("Could not find integer parameter for -x.",
         args.errorMessage());
   }
 }

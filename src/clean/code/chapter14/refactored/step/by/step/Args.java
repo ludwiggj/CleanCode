@@ -12,7 +12,7 @@ public class Args {
       new HashMap<Character, ArgumentMarshaller>();
   private Map<Character, ArgumentMarshaller> stringArgs =
       new HashMap<Character, ArgumentMarshaller>();
-  private Map<Character, Integer> intArgs = new HashMap<Character, Integer>();
+  private Map<Character, ArgumentMarshaller> intArgs = new HashMap<Character, ArgumentMarshaller>();
   private Set<Character> argsFound = new HashSet<Character>();
   private int currentArgument;
   private char errorArgumentId = '\0';
@@ -79,7 +79,7 @@ public class Args {
   }
 
   private void parseIntegerSchemaElement(char elementId) {
-    intArgs.put(elementId, 0);
+    intArgs.put(elementId, new IntegerArgumentMarshaller());
   }
 
   private void parseStringSchemaElement(char elementId) {
@@ -148,7 +148,7 @@ public class Args {
     String parameter = null;
     try {
       parameter = args[currentArgument];
-      intArgs.put(argChar, new Integer(parameter));
+      intArgs.get(argChar).setInteger(new Integer(parameter));
     } catch (ArrayIndexOutOfBoundsException e) {
       valid = false;
       errorArgumentId = argChar;
@@ -227,17 +227,14 @@ public class Args {
     return message.toString();
   }
 
-  private int zeroIfNull(Integer i) {
-    return i == null ? 0 : i;
-  }
-
   public String getString(char arg) {
     ArgumentMarshaller am = stringArgs.get(arg);
     return (am == null) ? "" : am.getString();
   }
 
   public int getInt(char arg) {
-    return zeroIfNull(intArgs.get(arg));
+    ArgumentMarshaller am = intArgs.get(arg);
+    return (am == null) ? 0 : am.getInteger();
   }
 
   public boolean getBoolean(char arg) {
@@ -259,6 +256,7 @@ public class Args {
   private class ArgumentMarshaller {
     private boolean booleanValue = false;
     private String stringValue;
+    private Integer intValue;
 
     public void setBoolean(boolean value) {
       booleanValue = value;
@@ -274,6 +272,14 @@ public class Args {
 
     public String getString() {
       return (stringValue == null) ? "" : stringValue;
+    }
+
+    public void setInteger(Integer i) {
+      this.intValue = i;
+    }
+
+    private Integer getInteger() {
+      return (intValue == null) ? 0 : intValue;
     }
   }
 

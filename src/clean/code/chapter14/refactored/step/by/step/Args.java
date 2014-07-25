@@ -152,25 +152,25 @@ public class Args {
     String parameter = null;
     try {
       parameter = args[currentArgument];
-      intArgs.get(argChar).setInteger(new Integer(parameter));
+      intArgs.get(argChar).set(parameter);
     } catch (ArrayIndexOutOfBoundsException e) {
       valid = false;
       errorArgumentId = argChar;
       errorCode = ErrorCode.MISSING_INTEGER;
       throw new ArgsException();
-    } catch (NumberFormatException e) {
+    } catch (ArgsException e) {
       valid = false;
       errorArgumentId = argChar;
       errorParameter = parameter;
       errorCode = ErrorCode.INVALID_INTEGER;
-      throw new ArgsException();
+      throw e;
     }
   }
 
   private void setStringArg(char argChar) throws ArgsException {
     currentArgument++;
     try {
-      stringArgs.get(argChar).setString(args[currentArgument]);
+      stringArgs.get(argChar).set(args[currentArgument]);
     } catch (ArrayIndexOutOfBoundsException e) {
       valid = false;
       errorArgumentId = argChar;
@@ -188,18 +188,18 @@ public class Args {
     String parameter = null;
     try {
       parameter = args[currentArgument];
-      booleanArgs.get(argChar).setBoolean(new Boolean(parameter));
+      booleanArgs.get(argChar).set(parameter);
     } catch (ArrayIndexOutOfBoundsException e) {
       valid = false;
       errorArgumentId = argChar;
       errorCode = ErrorCode.MISSING_BOOLEAN;
       throw new ArgsException();
-    } catch (NumberFormatException e) {
+    } catch (ArgsException e) {
       valid = false;
       errorArgumentId = argChar;
       errorParameter = parameter;
       errorCode = ErrorCode.INVALID_BOOLEAN;
-      throw new ArgsException();
+      throw e;
     }
   }
 
@@ -234,8 +234,8 @@ public class Args {
         return String.format("Could not find integer parameter for -%c.",
             errorArgumentId);
       case MISSING_BOOLEAN:
-          return String.format("Could not find boolean parameter for -%c.",
-              errorArgumentId);
+        return String.format("Could not find boolean parameter for -%c.",
+            errorArgumentId);
     }
     return "";
   }
@@ -252,17 +252,17 @@ public class Args {
 
   public String getString(char arg) {
     ArgumentMarshaller am = stringArgs.get(arg);
-    return (am == null) ? "" : am.getString();
+    return (am == null) ? "" : (String) am.get();
   }
 
   public int getInt(char arg) {
     ArgumentMarshaller am = intArgs.get(arg);
-    return (am == null) ? 0 : am.getInteger();
+    return (am == null) ? 0 : (Integer) am.get();
   }
 
   public boolean getBoolean(char arg) {
     ArgumentMarshaller am = booleanArgs.get(arg);
-    return (am != null) && am.getBoolean();
+    return (am != null) && (Boolean) am.get();
   }
 
   public boolean has(char arg) {
@@ -276,42 +276,54 @@ public class Args {
   private class ArgsException extends Exception {
   }
 
-  private class ArgumentMarshaller {
-    private boolean booleanValue = false;
-    private String stringValue;
-    private Integer intValue;
-
-    public void setBoolean(boolean value) {
-      booleanValue = value;
-    }
-
-    public boolean getBoolean() {
-      return booleanValue;
-    }
-
-    public void setString(String s) {
-      this.stringValue = s;
-    }
-
-    public String getString() {
-      return (stringValue == null) ? "" : stringValue;
-    }
-
-    public void setInteger(Integer i) {
-      this.intValue = i;
-    }
-
-    private Integer getInteger() {
-      return (intValue == null) ? 0 : intValue;
-    }
+  private abstract class ArgumentMarshaller {
+    public abstract void set(String s) throws ArgsException;
+    public abstract Object get();
   }
 
   private class BooleanArgumentMarshaller extends ArgumentMarshaller {
+    private boolean booleanValue = false;
+
+    @Override
+    public void set(String s) {
+      booleanValue = new Boolean(s);
+    }
+
+    @Override
+    public Object get() {
+      return booleanValue;
+    }
   }
 
   private class StringArgumentMarshaller extends ArgumentMarshaller {
+    private String stringValue;
+
+    @Override
+    public void set(String s) {
+      stringValue = s;
+    }
+
+    @Override
+    public Object get() {
+      return (stringValue == null) ? "" : stringValue;
+    }
   }
 
   private class IntegerArgumentMarshaller extends ArgumentMarshaller {
+    private Integer intValue;
+
+    @Override
+    public void set(String s) throws ArgsException {
+      try {
+        intValue = new Integer(s);
+      } catch (NumberFormatException e) {
+        throw new ArgsException();
+      }
+    }
+
+    @Override
+    public Object get() {
+      return (intValue == null) ? 0 : intValue;
+    }
   }
 }

@@ -18,9 +18,10 @@ public class Args {
   private char errorArgumentId = '\0';
   private String errorParameter = "TILT";
   private ErrorCode errorCode = ErrorCode.OK;
+  private int noOfArguments = 0;
 
   private enum ErrorCode {
-    OK, MISSING_STRING, MISSING_INTEGER, INVALID_INTEGER, UNEXPECTED_ARGUMENT
+    OK, MISSING_STRING, MISSING_INTEGER, MISSING_BOOLEAN, INVALID_INTEGER, INVALID_BOOLEAN, UNEXPECTED_ARGUMENT
   }
 
   public Args(String schema, String[] args) throws ParseException {
@@ -103,12 +104,15 @@ public class Args {
       String arg = args[currentArgument];
       parseArgument(arg);
     }
+    valid = valid && (noOfArguments > 0);
     return true;
   }
 
   private void parseArgument(String arg) throws ArgsException {
-    if (arg.startsWith("-"))
+    if (arg.startsWith("-")) {
+      noOfArguments = ++noOfArguments;
       parseElements(arg);
+    }
   }
 
   private void parseElements(String arg) throws ArgsException {
@@ -128,7 +132,7 @@ public class Args {
 
   private boolean setArgument(char argChar) throws ArgsException {
     if (isBooleanArg(argChar))
-      setBooleanArg(argChar, true);
+      setBooleanArg(argChar);
     else if (isStringArg(argChar))
       setStringArg(argChar);
     else if (isIntArg(argChar))
@@ -179,8 +183,24 @@ public class Args {
     return stringArgs.containsKey(argChar);
   }
 
-  private void setBooleanArg(char argChar, boolean value) {
-    booleanArgs.get(argChar).setBoolean(value);
+  private void setBooleanArg(char argChar) throws ArgsException {
+    currentArgument++;
+    String parameter = null;
+    try {
+      parameter = args[currentArgument];
+      booleanArgs.get(argChar).setBoolean(new Boolean(parameter));
+    } catch (ArrayIndexOutOfBoundsException e) {
+      valid = false;
+      errorArgumentId = argChar;
+      errorCode = ErrorCode.MISSING_BOOLEAN;
+      throw new ArgsException();
+    } catch (NumberFormatException e) {
+      valid = false;
+      errorArgumentId = argChar;
+      errorParameter = parameter;
+      errorCode = ErrorCode.INVALID_BOOLEAN;
+      throw new ArgsException();
+    }
   }
 
   private boolean isBooleanArg(char argChar) {
@@ -213,6 +233,9 @@ public class Args {
       case MISSING_INTEGER:
         return String.format("Could not find integer parameter for -%c.",
             errorArgumentId);
+      case MISSING_BOOLEAN:
+          return String.format("Could not find boolean parameter for -%c.",
+              errorArgumentId);
     }
     return "";
   }

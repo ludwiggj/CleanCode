@@ -230,4 +230,23 @@ public class ArgsTest {
     assertEquals("Could not find integer parameter for -x.", args.errorMessage());
     assertEquals(0, args.getInt('x'));
   }
+
+  // Other tests...
+  @Test
+  public void shouldReturnFalseIfCallGetBooleanOnNonBooleanArgument() throws Exception {
+    Args args = new Args("x#", new String[]{"-x", "42"});
+    assertEquals(false, args.getBoolean('x'));
+  }
+
+  @Test
+  public void shouldReturnEmptyStringIfCallGetStringOnNonStringArgument() throws Exception {
+    Args args = new Args("x#", new String[]{"-x", "42"});
+    assertEquals("", args.getString('x'));
+  }
+
+  @Test
+  public void shouldReturnZeroIfCallGetIntOnNonIntegerArgument() throws Exception {
+    Args args = new Args("x", new String[]{"-x", "false"});
+    assertEquals(0, args.getInt('x'));
+  }
 }

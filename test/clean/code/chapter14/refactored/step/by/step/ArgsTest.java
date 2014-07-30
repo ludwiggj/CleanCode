@@ -8,8 +8,7 @@ import org.junit.runners.JUnit4;
 
 import java.text.ParseException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 @RunWith(JUnit4.class)
 public class ArgsTest {
@@ -229,6 +228,51 @@ public class ArgsTest {
     assertEquals(false, args.isValid());
     assertEquals("Could not find integer parameter for -x.", args.errorMessage());
     assertEquals(0, args.getInt('x'));
+  }
+
+  // Double
+  @Test
+  public void shouldSupportDouble() throws Exception {
+    Args args = new Args("x##", new String[] {"-x", "42.3"});
+    assertTrue(args.isValid());
+    assertEquals(1, args.cardinality());
+    assertTrue(args.has('x'));
+    assertEquals(42.3, args.getDouble('x'), .001);
+  }
+
+  @Test
+  public void shouldReportErrorWhenDoubleArgumentValueIsWrongType() throws Exception {
+    Args args = new Args("x##", new String[] {"-x", "Forty two"});
+    assertFalse(args.isValid());
+    assertEquals(0, args.cardinality());
+    assertFalse(args.has('x'));
+    assertEquals(0, args.getInt('x'));
+    assertEquals("Argument -x expects a double but was 'Forty two'.", args.errorMessage());
+  }
+
+  @Test
+  public void getDoubleShouldReturnZeroIfArgumentNameIsNotInSchemaAndOtherArgumentsAreCorrect() throws Exception {
+    Args args = new Args("x##", new String[] {"-x", "25.4"});
+    assertTrue(args.isValid());
+    assertEquals(0.0, args.getDouble('y'), 0.01);
+  }
+
+  @Test
+  public void getDoubleShouldReturnZeroIfArgumentNameIsNotSupplied() throws Exception {
+    Args args = new Args("x##", new String[] {});
+    assertFalse(args.isValid());
+    assertEquals(0.0, args.getDouble('x'), 0.01);
+  }
+
+  @Test
+  public void getDoubleShouldReturnZeroIfArgumentValueIsNotSupplied() throws Exception {
+    Args args = new Args("x##", new String[] {"-x"});
+    assertFalse(args.isValid());
+    assertEquals(0, args.cardinality());
+    assertFalse(args.has('x'));
+    assertEquals(0.0, args.getDouble('x'), 0.01);
+    assertEquals("Could not find double parameter for -x.",
+            args.errorMessage());
   }
 
   // Other tests...

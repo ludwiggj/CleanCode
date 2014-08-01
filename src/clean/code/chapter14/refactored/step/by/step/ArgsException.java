@@ -3,6 +3,7 @@ package clean.code.chapter14.refactored.step.by.step;
 public class ArgsException extends Exception {
   private ErrorCode errorCode = ErrorCode.OK;
   private char errorArgumentId = '\0';
+
   private String errorParameter = "TILT";
 
   public ArgsException(ErrorCode errorCode) {
@@ -25,6 +26,10 @@ public class ArgsException extends Exception {
 
   public char getErrorArgumentId() {
     return errorArgumentId;
+  }
+
+  public String getErrorParameter() {
+    return errorParameter;
   }
 
   public enum ErrorCode {

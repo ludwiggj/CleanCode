@@ -29,7 +29,7 @@ public class ArgsTest {
       new Args("", new String[]{"-x"});
     } catch (ArgsException e) {
       assertEquals(UNEXPECTED_ARGUMENT, e.getErrorCode());
-      assertEquals("Argument(s) -x unexpected.", e.errorMessage());
+      assertEquals("Argument -x unexpected.", e.errorMessage());
       assertEquals('x', e.getErrorArgumentId());
 
       throw e;
@@ -43,7 +43,7 @@ public class ArgsTest {
       new Args("", new String[]{"-x", "-y"});
     } catch (ArgsException e) {
       assertEquals(UNEXPECTED_ARGUMENT, e.getErrorCode());
-      assertEquals("Argument(s) -x unexpected.", e.errorMessage());
+      assertEquals("Argument -x unexpected.", e.errorMessage());
       assertEquals('x', e.getErrorArgumentId());
 
       throw e;

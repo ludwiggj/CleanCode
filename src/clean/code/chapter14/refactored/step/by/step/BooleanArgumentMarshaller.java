@@ -7,16 +7,19 @@ public class BooleanArgumentMarshaller implements ArgumentMarshaller {
   private boolean booleanValue = false;
 
   @Override
-  public void set(Iterator<String> currentArgument, char argChar) throws ArgsException {
+  public void set(Iterator<String> currentArgument) throws ArgsException {
     try {
       booleanValue = new Boolean(currentArgument.next());
     } catch (NoSuchElementException e) {
-      throw new ArgsException(ArgsException.ErrorCode.MISSING_BOOLEAN, argChar);
+      throw new ArgsException(ArgsException.ErrorCode.MISSING_BOOLEAN);
     }
   }
 
-  @Override
-  public Object get() {
-    return booleanValue;
+  public static boolean getValue(ArgumentMarshaller am) {
+    if ((am != null) && am instanceof BooleanArgumentMarshaller) {
+      return ((BooleanArgumentMarshaller) am).booleanValue;
+    } else {
+      return false;
+    }
   }
 }

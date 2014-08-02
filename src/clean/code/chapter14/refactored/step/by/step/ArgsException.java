@@ -1,11 +1,10 @@
 package clean.code.chapter14.refactored.step.by.step;
 
 public class ArgsException extends Exception {
-  private ErrorCode errorCode = ErrorCode.OK;
   private char errorArgumentId = '\0';
 
   private String errorParameter = "TILT";
-
+  private ErrorCode errorCode = ErrorCode.OK;
   public ArgsException(ErrorCode errorCode) {
     this.errorCode = errorCode;
   }
@@ -15,6 +14,11 @@ public class ArgsException extends Exception {
     this.errorArgumentId = errorArgumentId;
   }
 
+  public ArgsException(ErrorCode errorCode, String errorParameter) {
+    this(errorCode);
+    this.errorParameter = errorParameter;
+  }
+
   public ArgsException(ErrorCode errorCode, char errorArgumentId, String errorParameter) {
     this(errorCode, errorArgumentId);
     this.errorParameter = errorParameter;
@@ -22,6 +26,10 @@ public class ArgsException extends Exception {
 
   public ErrorCode getErrorCode() {
     return errorCode;
+  }
+
+  public void setErrorArgumentId(char errorArgumentId) {
+    this.errorArgumentId = errorArgumentId;
   }
 
   public char getErrorArgumentId() {
@@ -43,7 +51,7 @@ public class ArgsException extends Exception {
       case OK:
         throw new Exception("TILT: Should not get here.");
       case UNEXPECTED_ARGUMENT:
-        return String.format("Argument(s) -%s unexpected.", errorArgumentId);
+        return String.format("Argument -%s unexpected.", errorArgumentId);
       case INVALID_ARGUMENT_NAME:
         return String.format("Bad character:%s in Args format", errorArgumentId);
       case MISSING_STRING:

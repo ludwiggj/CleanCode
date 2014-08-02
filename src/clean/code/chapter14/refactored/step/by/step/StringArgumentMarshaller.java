@@ -7,16 +7,19 @@ public class StringArgumentMarshaller implements ArgumentMarshaller {
   private String stringValue;
 
   @Override
-  public void set(Iterator<String> currentArgument, char argChar) throws ArgsException {
+  public void set(Iterator<String> currentArgument) throws ArgsException {
     try {
       stringValue = currentArgument.next();
     } catch (NoSuchElementException e) {
-      throw new ArgsException(ArgsException.ErrorCode.MISSING_STRING, argChar);
+      throw new ArgsException(ArgsException.ErrorCode.MISSING_STRING);
     }
   }
 
-  @Override
-  public Object get() {
-    return (stringValue == null) ? "" : stringValue;
+  public static String getValue(ArgumentMarshaller am) {
+    if ((am != null) && am instanceof StringArgumentMarshaller) {
+      return ((StringArgumentMarshaller) am).stringValue;
+    } else {
+      return "";
+    }
   }
 }

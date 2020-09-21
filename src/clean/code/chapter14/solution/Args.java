@@ -49,7 +49,7 @@ public class Args {
   }
 
   private void parseArgumentStrings(List<String> argsList) throws ArgsException {
-    if (argsList.size() > 0) {
+    for (currentArgument = argsList.listIterator(); currentArgument.hasNext();) {
       currentArgument = argsList.listIterator();
       String argString = currentArgument.next();
       if (argString.startsWith("-")) {
